@@ -7,3 +7,9 @@
 > email: zpengac | github: Shimmer93 | dev branch: zpengac
 
 > Task 1 & Task 4
+
+3. LI Jingchen
+
+> email: jlieg | github: Nilbug | dev branch: jlieg
+
+> Task 3 & Task 6
