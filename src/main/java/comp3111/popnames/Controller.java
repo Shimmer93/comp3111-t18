@@ -3,12 +3,30 @@
  */
 package comp3111.popnames;
 
+import java.util.*;
+import java.util.Map.Entry;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.util.Pair;
+import javafx.scene.control.RadioButton;
 
 public class Controller {
 
@@ -43,6 +61,21 @@ public class Controller {
     private Tab tabReport1;
 
     @FXML
+    private TextField textFieldTopN;
+
+    @FXML
+    private RadioButton radioMale1;
+
+    @FXML
+    private RadioButton radioFemale1;
+
+    @FXML
+    private TextField textFieldTo1;
+
+    @FXML
+    private TextField textFieldFrom1;
+    
+    @FXML
     private ToggleGroup T1;
 
     @FXML
@@ -59,6 +92,33 @@ public class Controller {
 
     @FXML
     private Tab tabApp1;
+    
+    @FXML
+    private TextField textFieldDadName;
+
+    @FXML
+    private TextField textFieldMomName;
+
+    @FXML
+    private TextField textFieldDadYOB;
+
+    @FXML
+    private TextField textFieldMomYOB;
+
+    @FXML
+    private RadioButton radioWithVin;
+
+    @FXML
+    private ToggleGroup isWithVin;
+
+    @FXML
+    private RadioButton radioWithoutVin;
+
+    @FXML
+    private TextField textFieldVin;
+
+    @FXML
+    private Button buttonGetRecom;
 
     @FXML
     private Tab tabApp2;
@@ -69,7 +129,45 @@ public class Controller {
     @FXML
     private TextArea textAreaConsole;
     
+    
+    boolean verifyInputNotEmpty(TextInputControl ... cs) {
+    	boolean result = true;
+    	for (TextInputControl c : cs) {
+    		if (c.getText().trim().isEmpty()) {
+    			result = false;
+    			break;
+    		}
+    	}
+    	return result;
+    }
+    
+    boolean verifyYearInRange(int ... is) {
+    	boolean result = true;
+    	for (int i : is) {
+    		if (i > 2019 || i < 1880) {
+    			result = false;
+    			break;
+    		}
+    	}
+    	return result;
+    }
 
+    void displayTable(TableView<?> table, String oReport) {
+    	try {
+	    	FXMLLoader loader = new FXMLLoader();
+	    	loader.setLocation(getClass().getResource("/table.fxml"));
+	   		Pane root = (Pane) loader.load();
+			root.getChildren().add(table);
+	   		Scene scene = new Scene(root);
+	   		Stage stage = new Stage();
+	   		stage.setScene(scene);
+	   		stage.setTitle("Report");
+	   		stage.show();
+    	} catch(Exception e) {
+    		oReport += "Error: Cannot Display Table. Please contact the developer if this message is seen.";
+    	}
+    }
+    
     /**
      *  Task Zero
      *  To be triggered by the "Summary" button on the Task Zero Tab 
@@ -154,6 +252,139 @@ public class Controller {
     	textAreaConsole.setText(oReport);
     }
     
-
+    /**
+     * Task One
+     * To be triggered by the "Report" button on the Task One (Reporting 1) Tab
+     * 
+     */
+    @FXML
+    void reportTopNames() {
+    	String oReport = "";
+    	
+    	if (verifyInputNotEmpty(textFieldTopN, textFieldFrom1, textFieldTo1)) {
+	    	try {
+	    		// Initialize values
+		    	int topN = Integer.parseInt(textFieldTopN.getText());
+		    	RadioButton selected = (RadioButton) T1.getSelectedToggle();
+		    	String gender = selected.getText();
+		    	int yearFrom = Integer.parseInt(textFieldFrom1.getText());
+		    	int yearTo = Integer.parseInt(textFieldTo1.getText());
+		    	
+		    	if (verifyYearInRange(yearFrom, yearTo)) {
+		    		// Initialize the table
+		    		TableView<List<String>> table = new TableView<>();
+			   		for (int i=0; i<topN; i++) {
+			   			final int index = i;
+			   			TableColumn<List<String>, String> tableColumn = new TableColumn<List<String>, String>(index == 0 ? "Year" :String.format("Top %d", i));
+			   			tableColumn.setCellValueFactory(new Callback<CellDataFeatures<List<String>, String>, ObservableValue<String>>() {
+			   			    @Override
+			   			    public ObservableValue<String> call(CellDataFeatures<List<String>, String> data) {
+			   			        return new ReadOnlyStringWrapper(data.getValue().get(index)) ;
+			   			    }
+			   			});
+			   			table.getColumns().add(tableColumn);
+			   		}
+			   		
+			   		// Deal with data
+			   		Map<String, Integer> nameCounts = new TreeMap<String, Integer>();
+			   		final ObservableList<List<String>> tableItems = FXCollections.observableArrayList();
+					for (int year=yearFrom; year<=yearTo; year++) {
+						// Count the times of top spots
+						String name = AnalyzeNames.getName(year, 1, Character.toString(gender.charAt(0)));
+						if (nameCounts.containsKey(name))
+							nameCounts.replace(name, nameCounts.get(name)+1);
+						else
+							nameCounts.put(name, 1);
+						
+						// add items to the table
+						List<String> names = new ArrayList<>();
+						names.add(Integer.toString(year));
+						for (int i=1; i<=topN; i++) {
+							String namei = AnalyzeNames.getName(year, i, Character.toString(gender.charAt(0)));
+							names.add(namei);
+						}
+						tableItems.add(names);
+					}
+					table.setItems(tableItems);
+					
+					// display the table
+					displayTable(table, oReport);
+			    	
+					// Compute the name with most top spots
+			    	Entry<String, Integer> maxNameCount = Collections.max(nameCounts.entrySet(), new Comparator<Entry<String, Integer>>() {
+			            public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2) {
+			                return e1.getValue()
+			                    .compareTo(e2.getValue());
+			            }
+			        });
+			    	
+			    	oReport += String.format("Over the period %d to %d, %s for %s has hold the top spot most often for a total of %d times.\n", 
+			    			yearFrom, yearTo, maxNameCount.getKey(), gender.toLowerCase(), maxNameCount.getValue());
+		    	} else {
+		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
+		    	}
+		    } catch (Exception e) {
+				oReport += "Error: Invalid Input. Please check your input values.\n";
+			}
+		} else {
+			oReport += "Error: Empty Input. Please fill in all the text fields.\n";
+		}
+    	
+    	// Show summary and error messages in the console
+    	textAreaConsole.setText(oReport);
+    }
+    
+    /**
+     * Task Four
+     * To be triggered by the "Get Recommendation" button on the Task Four (Application 4) Tab
+     * 
+     */
+    @FXML
+    void disableVin() {
+    	textFieldVin.setDisable(true);
+    }
+    
+    @FXML
+    void enableVin() {
+    	textFieldVin.setDisable(false);
+    }
+    
+    @FXML
+    void getRecommendedBabyName() {
+    	String oReport = "";
+    	
+    	if (verifyInputNotEmpty(textFieldDadName, textFieldDadYOB, textFieldMomName, textFieldMomYOB)
+    			&& (radioWithoutVin.isSelected() || verifyInputNotEmpty(textFieldVin))) {
+			try {
+				// Initialize values
+				String dadName = textFieldDadName.getText();
+				String momName = textFieldMomName.getText();
+				int dadYOB = Integer.parseInt(textFieldDadYOB.getText());
+				int momYOB = Integer.parseInt(textFieldMomYOB.getText());	
+				int vintageYear;
+				if (radioWithVin.isSelected())
+					vintageYear = Integer.parseInt(textFieldVin.getText());
+				else
+					vintageYear = 2019;
+				
+				if (verifyYearInRange(dadYOB, momYOB, vintageYear)) {
+					// Compute recommended names
+					Pair<String, String> namePair = AnalyzeNames.recommendBabyName(dadName, dadYOB, momName, momYOB, vintageYear);
+					String boyName = namePair.getKey();
+					String girlName = namePair.getValue();
+					
+					oReport = String.format("Boy name: %s\nGirl name: %s\n", boyName, girlName);
+				} else {
+					oReport += "Error: Year Out of Range. Please check your input years.\n";
+				}
+			} catch (Exception e) {
+				oReport += "Error: Invalid Input. Please check your input values.\n";
+			}
+    	} else {
+    		oReport += "Error: Empty Input. Please fill in all the text fields.\n";
+    	}
+    	
+    	textAreaConsole.setText(oReport);
+    }
+    
 }
-
