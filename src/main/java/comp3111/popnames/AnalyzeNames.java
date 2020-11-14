@@ -93,5 +93,23 @@ public class AnalyzeNames {
 	     else
 	     	return "information on the name at the specified rank is not available";
 	 }
+	 
+	 public static float compatibleScore (String iName, String iGender,int iYOB, String iNameMate, String iGenderMate, String iPreference) {
+		 int oRank = getRank(iYOB, iName, iGender);
+		 int oYOB = iYOB;
+		 if (iPreference == "Younger")
+			 oYOB = iYOB + 1;
+		 else if (iPreference == "Older")
+			 oYOB = iYOB - 1;
+		 int oRankMate = getRank(oYOB, iNameMate, iGenderMate);
+		 if (oRank == -1)
+			 oRank = 1;
+		 if (oRankMate == -1)
+			 oRankMate = 1;
+		 float oScore = 1-Math.abs((oRank - oRankMate)/oRank);
+		 
+		 return oScore;
+	 }
+
  
 }
