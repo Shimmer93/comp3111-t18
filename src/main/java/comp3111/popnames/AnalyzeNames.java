@@ -2,6 +2,7 @@ package comp3111.popnames;
 
 import org.apache.commons.csv.*;
 import edu.duke.*;
+import javafx.util.Pair;
 
 public class AnalyzeNames {
 
@@ -93,6 +94,18 @@ public class AnalyzeNames {
 	     else
 	     	return "information on the name at the specified rank is not available";
 	 }
+
+	 public static Pair<String, String> recommendBabyName(String dadName, int dadYOB, String momName, int momYOB, int vintageYear) {
+		 int dadRank = getRank(dadYOB, dadName, "M");
+		 int momRank = getRank(momYOB, momName, "F");
+		 if (dadRank == -1)
+			 dadRank = 1;
+		 if (momRank == -1)
+			 momRank = 1;
+		 String boyName = getName(vintageYear, dadRank, "M");
+		 String girlName = getName(vintageYear, momRank, "F");
+		 return new Pair<String, String>(boyName, girlName);
+	 }
 	 
 	 public static float compatibleScore (String iName, String iGender,int iYOB, String iNameMate, String iGenderMate, String iPreference) {
 		 int oRank = getRank(iYOB, iName, iGender);
@@ -111,5 +124,5 @@ public class AnalyzeNames {
 		 return oScore;
 	 }
 
- 
+
 }

@@ -8,6 +8,12 @@
 
 > Task 1 & Task 4
 
+2. LIU Zhetian
+
+> email: zliucl | github: Tany2020 | dev branch: tany_feature1
+
+> Task 2 & Task 5
+
 3. LI Jingchen
 
 > email: jlieg | github: Nilbug | dev branch: jlieg
