@@ -257,8 +257,8 @@ public class Controller {
      * To be triggered by the "Report" button on the Task One (Reporting 1) Tab
      * 
      */
-    @FXML
-    void reportTopNames() {
+    //@FXML
+    void reportTopNames0() {
     	String oReport = "";
     	
     	if (verifyInputNotEmpty(textFieldTopN, textFieldFrom1, textFieldTo1)) {
@@ -309,6 +309,73 @@ public class Controller {
 					
 					// display the table
 					displayTable(table, oReport);
+			    	
+					// Compute the name with most top spots
+			    	Entry<String, Integer> maxNameCount = Collections.max(nameCounts.entrySet(), new Comparator<Entry<String, Integer>>() {
+			            public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2) {
+			                return e1.getValue()
+			                    .compareTo(e2.getValue());
+			            }
+			        });
+			    	
+			    	oReport += String.format("Over the period %d to %d, %s for %s has hold the top spot most often for a total of %d times.\n", 
+			    			yearFrom, yearTo, maxNameCount.getKey(), gender.toLowerCase(), maxNameCount.getValue());
+		    	} else {
+		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
+		    	}
+		    } catch (Exception e) {
+				oReport += "Error: Invalid Input. Please check your input values.\n";
+			}
+		} else {
+			oReport += "Error: Empty Input. Please fill in all the text fields.\n";
+		}
+    	
+    	// Show summary and error messages in the console
+    	textAreaConsole.setText(oReport);
+    }
+    
+    @FXML
+    void reportTopNames() {
+    	String oReport = "";
+    	
+    	if (verifyInputNotEmpty(textFieldTopN, textFieldFrom1, textFieldTo1)) {
+	    	try {
+	    		// Initialize values
+		    	int topN = Integer.parseInt(textFieldTopN.getText());
+		    	RadioButton selected = (RadioButton) T1.getSelectedToggle();
+		    	String gender = Character.toString(selected.getText().charAt(0));
+		    	int yearFrom = Integer.parseInt(textFieldFrom1.getText());
+		    	int yearTo = Integer.parseInt(textFieldTo1.getText());
+		    	
+		    	if (verifyYearInRange(yearFrom, yearTo)) {
+		    		// Initialize the table
+		    		List<String> tableColumnNames = new ArrayList<>();
+		    		for (int i=0; i<topN; i++)
+		    			tableColumnNames.add(i == 0 ? "Year" : String.format("Top %d", i));
+		    		TableWrapper table = new TableWrapper(tableColumnNames);
+			   		
+			   		// Deal with data
+			   		Map<String, Integer> nameCounts = new TreeMap<String, Integer>();
+					for (int year=yearFrom; year<=yearTo; year++) {
+						// Count the times of top spots
+						String name = AnalyzeNames.getName(year, 1, gender);
+						if (nameCounts.containsKey(name))
+							nameCounts.replace(name, nameCounts.get(name)+1);
+						else
+							nameCounts.put(name, 1);
+						
+						// add items to the table
+						List<String> names = new ArrayList<>();
+						names.add(Integer.toString(year));
+						for (int i=1; i<=topN; i++) {
+							String namei = AnalyzeNames.getName(year, i, gender);
+							names.add(namei);
+						}
+						table.addRow(names);
+					}
+					
+					// display the table
+					displayTable(table.getTable(), oReport);
 			    	
 					// Compute the name with most top spots
 			    	Entry<String, Integer> maxNameCount = Collections.max(nameCounts.entrySet(), new Comparator<Entry<String, Integer>>() {
