@@ -266,31 +266,22 @@ public class Controller {
 	    		// Initialize values
 		    	int topN = Integer.parseInt(textFieldTopN.getText());
 		    	RadioButton selected = (RadioButton) T1.getSelectedToggle();
-		    	String gender = selected.getText();
+		    	String gender = Character.toString(selected.getText().charAt(0));
 		    	int yearFrom = Integer.parseInt(textFieldFrom1.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo1.getText());
 		    	
 		    	if (verifyYearInRange(yearFrom, yearTo)) {
 		    		// Initialize the table
-		    		TableView<List<String>> table = new TableView<>();
-			   		for (int i=0; i<topN; i++) {
-			   			final int index = i;
-			   			TableColumn<List<String>, String> tableColumn = new TableColumn<List<String>, String>(index == 0 ? "Year" :String.format("Top %d", i));
-			   			tableColumn.setCellValueFactory(new Callback<CellDataFeatures<List<String>, String>, ObservableValue<String>>() {
-			   			    @Override
-			   			    public ObservableValue<String> call(CellDataFeatures<List<String>, String> data) {
-			   			        return new ReadOnlyStringWrapper(data.getValue().get(index)) ;
-			   			    }
-			   			});
-			   			table.getColumns().add(tableColumn);
-			   		}
+		    		List<String> tableColumnNames = new ArrayList<>();
+		    		for (int i=0; i<topN; i++)
+		    			tableColumnNames.add(i == 0 ? "Year" : String.format("Top %d", i));
+		    		TableWrapper table = new TableWrapper(tableColumnNames);
 			   		
 			   		// Deal with data
 			   		Map<String, Integer> nameCounts = new TreeMap<String, Integer>();
-			   		final ObservableList<List<String>> tableItems = FXCollections.observableArrayList();
 					for (int year=yearFrom; year<=yearTo; year++) {
 						// Count the times of top spots
-						String name = AnalyzeNames.getName(year, 1, Character.toString(gender.charAt(0)));
+						String name = AnalyzeNames.getName(year, 1, gender);
 						if (nameCounts.containsKey(name))
 							nameCounts.replace(name, nameCounts.get(name)+1);
 						else
@@ -300,15 +291,14 @@ public class Controller {
 						List<String> names = new ArrayList<>();
 						names.add(Integer.toString(year));
 						for (int i=1; i<=topN; i++) {
-							String namei = AnalyzeNames.getName(year, i, Character.toString(gender.charAt(0)));
+							String namei = AnalyzeNames.getName(year, i, gender);
 							names.add(namei);
 						}
-						tableItems.add(names);
+						table.addRow(names);
 					}
-					table.setItems(tableItems);
 					
 					// display the table
-					displayTable(table, oReport);
+					displayTable(table.getTable(), oReport);
 			    	
 					// Compute the name with most top spots
 			    	Entry<String, Integer> maxNameCount = Collections.max(nameCounts.entrySet(), new Comparator<Entry<String, Integer>>() {
