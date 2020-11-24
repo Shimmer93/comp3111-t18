@@ -6,27 +6,20 @@ package comp3111.popnames;
 import java.util.*;
 import java.util.Map.Entry;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.RadioButton;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.Pair;
-import javafx.scene.control.RadioButton;
 
 public class Controller {
 
@@ -61,7 +54,7 @@ public class Controller {
     private Tab tabReport1;
 
     @FXML
-    private TextField textFieldTopN;
+    private TextField textFieldTopN1;
 
     @FXML
     private RadioButton radioMale1;
@@ -214,6 +207,7 @@ public class Controller {
 	    	FXMLLoader loader = new FXMLLoader();
 	    	loader.setLocation(getClass().getResource("/table.fxml"));
 	   		Pane root = (Pane) loader.load();
+	   		table.prefWidthProperty().bind(root.widthProperty());
 			root.getChildren().add(table);
 	   		Scene scene = new Scene(root);
 	   		Stage stage = new Stage();
@@ -318,19 +312,19 @@ public class Controller {
     void reportTopNames() {
     	String oReport = "";
     	
-    	if (verifyInputNotEmpty(textFieldTopN, textFieldFrom1, textFieldTo1)) {
+    	if (verifyInputNotEmpty(textFieldTopN1, textFieldFrom1, textFieldTo1)) {
 	    	try {
 	    		// Initialize values
-		    	int topN = Integer.parseInt(textFieldTopN.getText());
+		    	int topN = Integer.parseInt(textFieldTopN1.getText());
 		    	RadioButton selected = (RadioButton) T1.getSelectedToggle();
 		    	String gender = Character.toString(selected.getText().charAt(0));
 		    	int yearFrom = Integer.parseInt(textFieldFrom1.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo1.getText());
 		    	
-		    	if (verifyYearInRange(yearFrom, yearTo)) {
+		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
 		    		// Initialize the table
 		    		List<String> tableColumnNames = new ArrayList<>();
-		    		for (int i=0; i<topN; i++)
+		    		for (int i=0; i<=topN; i++)
 		    			tableColumnNames.add(i == 0 ? "Year" : String.format("Top %d", i));
 		    		TableWrapper table = new TableWrapper(tableColumnNames);
 			   		
@@ -442,63 +436,34 @@ public class Controller {
     void reportNameTrend() {
     	String oReport = "";
     	
-    	if (verifyInputNotEmpty(textFieldFrom3, textFieldTo3)) {
+    	if (verifyInputNotEmpty(textFieldTopN3, textFieldFrom3, textFieldTo3)) {
 	    	try {
 	    		// Initialize values
-	    		int topN = Integer.parseInt(textFieldTopN.getText());
+	    		int topN = Integer.parseInt(textFieldTopN3.getText());
 		    	RadioButton selected = (RadioButton) T111.getSelectedToggle();
-		    	String gender = selected.getText();
+		    	String gender = Character.toString(selected.getText().charAt(0));
 		    	int yearFrom = Integer.parseInt(textFieldFrom3.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo3.getText());
 		    	
-		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom != yearTo) {
+		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
 		    		// Initialize the table
-		    		TableView<List<String>> table = new TableView<>();
-		  
-		    		for (int i=0; i<4; i++) {
-		    			final int index = i;
-		    			String colName = "";
-			   			switch(i){
-			   			case 0: colName = "Name";
-			   			break;
-			   			case 1: colName = "Lowest Rank\n[in year]";
-			   			break;
-			   			case 2: colName = "Highest Rank\n [in year]";
-			   			break;
-			   			case 3: colName = "Trend";
-			   			break;
-			   			}
-			   				
-			   			TableColumn<List<String>, String> tableColumn = new TableColumn<List<String>, String>(colName);
-			   			tableColumn.setCellValueFactory(new Callback<CellDataFeatures<List<String>, String>, ObservableValue<String>>() {
-			   			    @Override
-			   			    public ObservableValue<String> call(CellDataFeatures<List<String>, String> data) {
-			   			        return new ReadOnlyStringWrapper(data.getValue().get(index)) ;
-			   			    }
-			   			});
-			   			table.getColumns().add(tableColumn);
-			   		}
+		    		
+		    		String tableColumnNames[] = {"Name", "Lowest Rank\n[in year]", "Highest Rank\n [in year]", "Trend"};
+		    		TableWrapper table = new TableWrapper(Arrays.asList(tableColumnNames));
 			   		
 			   		// Deal with data
-			   		
-			   		final ObservableList<List<String>> tableItems = FXCollections.observableArrayList();
-			   		List<String> names = new ArrayList<>();
 			   		List<String> finalNames = new ArrayList<>();
-			   		// initialize the name list of yearFrom to go through
-					for (int i=1; i<=topN; i++) {
-						String namei = AnalyzeNames.getName(yearFrom, i, Character.toString(gender.charAt(0)));
-						names.add(namei);
-					}
+					
 					// loop through all years for each name in name list
-					for (int i = 0; i < names.size(); i++) {
-						String name = names.get(i);
+					for (int i = 0; i < topN; i++) {
+						String name = AnalyzeNames.getName(yearFrom, i+1, gender);
 						int hiRank = i + 1;
 						int loRank = i + 1;
 						int hiYear = yearFrom;
 						int loYear = yearFrom;		
 						boolean inTopN = true;
 						for (int year=yearFrom + 1; year<=yearTo; year++) {
-							int rank = AnalyzeNames.getRank(year, name, Character.toString(gender.charAt(0)));
+							int rank = AnalyzeNames.getRank(year, name, gender);
 							// in each year, check whether the names rank is out of TopN 
 							if (rank > topN || rank == -1) {
 								inTopN = false;
@@ -512,9 +477,7 @@ public class Controller {
 							if (rank < hiRank) {
 								hiRank = rank;
 								hiYear = year;
-							}
-							
-							
+							}	
 						}
 						if (!inTopN)
 							continue;
@@ -525,26 +488,27 @@ public class Controller {
 						row.add(Integer.toString(hiRank)+"\n"+"["+ Integer.toString(hiYear)+"]");
 						if (hiYear == loYear)
 							row.add("FLAT");
-						else if(hiYear>loYear)
+						else if(hiYear > loYear)
 							row.add("UP");
 						else
 							row.add("DOWN");
 								
-						tableItems.add(row);
+						table.addRow(row);
 						finalNames.add(name);
 					}
-					table.setItems(tableItems);
 					
-					// display the table
-					displayTable(table, oReport);
-			    	
-			    	
-			    	oReport += String.format("Over the period %d to %d, the %d names below maintained a high level of popularity within Top %d: \n", 
-			    			yearFrom, yearTo,finalNames.size(), topN) ;
-			    	for (String str : finalNames ) {
-			    		oReport += str;
-			    		oReport += "\n";
-			    	}
+					if (finalNames.isEmpty()) {
+						oReport += String.format("Over the period %d to %d, no name maintained a high level of popularity within Top %d: \n", 
+				    			yearFrom, yearTo, topN) ;
+					} else {
+						// display the table
+						displayTable(table.getTable(), oReport);
+						
+						oReport += String.format("Over the period %d to %d, the %d names below maintained a high level of popularity within Top %d: \n", 
+								yearFrom, yearTo, finalNames.size(), topN) ;
+						for (String name : finalNames )
+							oReport += name+"\n";					
+					}
 			    		
 		    	} else {
 		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
@@ -576,9 +540,9 @@ public class Controller {
 				String iNameMate = textFieldiNameMate.getText();
 				int iYOB = Integer.parseInt(textFieldiYOB.getText());	
 				RadioButton iGenderSelected = (RadioButton) iGender.getSelectedToggle();
-		    	String igender = iGenderSelected.getText();
+		    	String igender = Character.toString(iGenderSelected.getText().charAt(0));
 		    	RadioButton iGenderMateSelected = (RadioButton) iGenderMate.getSelectedToggle();
-		    	String igenderMate = iGenderMateSelected.getText();
+		    	String igenderMate = Character.toString(iGenderMateSelected.getText().charAt(0));
 				RadioButton iPreferenceSelected = (RadioButton) iPreference.getSelectedToggle();
 		    	String ipreference = iPreferenceSelected.getText();
 		    	int oYOB = iYOB;
@@ -589,14 +553,14 @@ public class Controller {
 			    if (verifyYearInRange(iYOB)) {
 			    	if (verifyYearInRange(oYOB)) {
 						// Compute score
-						float score = AnalyzeNames.compatibleScore(iName, Character.toString(igender.charAt(0)) , iYOB,iNameMate , Character.toString(igenderMate.charAt(0)), oYOB);
+						float score = AnalyzeNames.compatibleScore(iName, igender, iYOB, iNameMate, igenderMate, oYOB);
 
-						oReport = String.format("The compatible score for %s and %s is %f %%.", iName,iNameMate,score*100);
+						oReport = String.format("The compatible score for %s and %s is %f %%.", iName, iNameMate, score*100);
 						
 					} 
 			    	else {
 						oReport += "Error: Your preferred mate age is not supported. Please check your input year and preference.\n";
-						}
+					}
 				}
 			    else {
 						oReport +="Error: Year Out of Range. Please check your input year.\n" ;
