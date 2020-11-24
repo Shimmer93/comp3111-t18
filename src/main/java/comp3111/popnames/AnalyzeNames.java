@@ -107,20 +107,15 @@ public class AnalyzeNames {
 		 return new Pair<String, String>(boyName, girlName);
 	 }
 	 
-	 public static float compatibleScore (String iName, String iGender,int iYOB, String iNameMate, String iGenderMate, String iPreference) {
+	 public static float compatibleScore (String iName, String iGender,int iYOB, String iNameMate, String iGenderMate, int oYOB) {
 		 int oRank = getRank(iYOB, iName, iGender);
-		 int oYOB = iYOB;
-		 if (iPreference == "Younger")
-			 oYOB = iYOB + 1;
-		 else if (iPreference == "Older")
-			 oYOB = iYOB - 1;
 		 int oRankMate = getRank(oYOB, iNameMate, iGenderMate);
 		 if (oRank == -1)
 			 oRank = 1;
 		 if (oRankMate == -1)
 			 oRankMate = 1;
-		 float oScore = 1-Math.abs((oRank - oRankMate)/oRank);
-		 
+		 float oScore =1-Float.valueOf(Math.abs((oRank - oRankMate)))/Math.max(oRank,oRankMate); 
+		  
 		 return oScore;
 	 }
 
