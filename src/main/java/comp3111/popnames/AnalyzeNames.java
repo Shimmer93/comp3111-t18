@@ -92,7 +92,27 @@ public class AnalyzeNames {
 	     if (found)
 	     	return oName;
 	     else
-	     	return "information on the name at the specified rank is not available";
+	     	return "Not available";
+	 }
+	 
+	 public static int getMaxRank(int year, String gender) {
+		 int maxRank = 0;
+		 for (CSVRecord rec : getFileParser(year)) {
+			 if (rec.get(1).equals(gender)) {
+				 maxRank ++;
+			 }
+		 }
+		 return maxRank;
+	 }
+	 
+	 public static int getMaxRankInPeriod(int yearFrom, int yearTo, String gender) {
+		 int maxRank = 0;
+		 for (int year=yearFrom; year<=yearTo; year++) {
+			 int new_maxRank = getMaxRank(year, gender);
+			 if (new_maxRank > maxRank)
+				 maxRank = new_maxRank;
+		 }
+		 return maxRank;
 	 }
 
 	 public static Pair<String, String> recommendBabyName(String dadName, int dadYOB, String momName, int momYOB, int vintageYear) {
