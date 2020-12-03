@@ -208,6 +208,7 @@ public class Controller {
 	    	loader.setLocation(getClass().getResource("/table.fxml"));
 	   		Pane root = (Pane) loader.load();
 	   		table.prefWidthProperty().bind(root.widthProperty());
+	   		table.prefHeightProperty().bind(root.heightProperty());
 			root.getChildren().add(table);
 	   		Scene scene = new Scene(root);
 	   		Stage stage = new Stage();
@@ -330,20 +331,22 @@ public class Controller {
 			   		
 			   		// Deal with data
 			   		Map<String, Integer> nameCounts = new TreeMap<String, Integer>();
-					for (int year=yearFrom; year<=yearTo; year++) {
-						// Count the times of top spots
-						String name = AnalyzeNames.getName(year, 1, gender);
-						if (nameCounts.containsKey(name))
-							nameCounts.replace(name, nameCounts.get(name)+1);
-						else
-							nameCounts.put(name, 1);
-						
-						// add items to the table
+					for (int year=yearFrom; year<=yearTo; year++) {			
 						List<String> names = new ArrayList<>();
 						names.add(Integer.toString(year));
+						
 						for (int i=1; i<=topN; i++) {
-							String namei = AnalyzeNames.getName(year, i, gender);
-							names.add(namei);
+							// add items to the table
+							String name = AnalyzeNames.getName(year, i, gender);
+							names.add(name);
+							
+							// Count the times of top spots
+							if (i==1) {
+								if (nameCounts.containsKey(name))
+									nameCounts.replace(name, nameCounts.get(name)+1);
+								else
+									nameCounts.put(name, 1);
+							}
 						}
 						table.addRow(names);
 					}
@@ -360,7 +363,7 @@ public class Controller {
 			        });
 			    	
 			    	oReport += String.format("Over the period %d to %d, %s for %s has hold the top spot most often for a total of %d times.\n", 
-			    			yearFrom, yearTo, maxNameCount.getKey(), gender.toLowerCase(), maxNameCount.getValue());
+			    			yearFrom, yearTo, maxNameCount.getKey(), selected.getText().toLowerCase(), maxNameCount.getValue());
 		    	} else {
 		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
 		    	}
@@ -402,11 +405,7 @@ public class Controller {
 				String momName = textFieldMomName.getText();
 				int dadYOB = Integer.parseInt(textFieldDadYOB.getText());
 				int momYOB = Integer.parseInt(textFieldMomYOB.getText());	
-				int vintageYear;
-				if (radioWithVin.isSelected())
-					vintageYear = Integer.parseInt(textFieldVin.getText());
-				else
-					vintageYear = 2019;
+				int vintageYear = radioWithVin.isSelected() ? Integer.parseInt(textFieldVin.getText()) : 2019;
 				
 				if (verifyYearInRange(dadYOB, momYOB, vintageYear)) {
 					// Compute recommended names
@@ -445,75 +444,77 @@ public class Controller {
 		    	int yearFrom = Integer.parseInt(textFieldFrom3.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo3.getText());
 		    	if (topN >= 1) {
-		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
-		    		// Initialize the table
-		    		
-		    		String tableColumnNames[] = {"Name", "Lowest Rank\n[in year]", "Highest Rank\n [in year]", "Trend"};
-		    		TableWrapper table = new TableWrapper(Arrays.asList(tableColumnNames));
-			   		
-			   		// Deal with data
-			   		List<String> finalNames = new ArrayList<>();
-					
-					// loop through all years for each name in name list
-					for (int i = 0; i < topN; i++) {
-						String name = AnalyzeNames.getName(yearFrom, i+1, gender);
-						int hiRank = i + 1;
-						int loRank = i + 1;
-						int hiYear = yearFrom;
-						int loYear = yearFrom;		
-						boolean inTopN = true;
-						for (int year=yearFrom + 1; year<=yearTo; year++) {
-							int rank = AnalyzeNames.getRank(year, name, gender);
-							// in each year, check whether the names rank is out of TopN 
-							if (rank > topN || rank == -1) {
-								inTopN = false;
-								break;
-							}
-							// update the highest/lowest rank/year
-							if (rank > loRank) {
-								loRank = rank;
-								loYear = year;
-							}
-							if (rank < hiRank) {
-								hiRank = rank;
-								hiYear = year;
-							}	
-						}
-						if (!inTopN)
-							continue;
-						// add items to the table
-						List<String> row = new ArrayList<>();
-						row.add(name);
-						row.add(Integer.toString(loRank)+"\n"+"["+ Integer.toString(loYear)+"]");
-						row.add(Integer.toString(hiRank)+"\n"+"["+ Integer.toString(hiYear)+"]");
-						if (hiYear == loYear)
-							row.add("FLAT");
-						else if(hiYear > loYear)
-							row.add("UP");
-						else
-							row.add("DOWN");
-								
-						table.addRow(row);
-						finalNames.add(name);
-					}
-					
-					if (finalNames.isEmpty()) {
-						oReport += String.format("Over the period %d to %d, no name maintained a high level of popularity within Top %d. \n", 
-				    			yearFrom, yearTo, topN) ;
-					} else {
-						// display the table
-						displayTable(table.getTable(), oReport);
-						
-						oReport += String.format("Over the period %d to %d, the %d names below maintained a high level of popularity within Top %d: \n", 
-								yearFrom, yearTo, finalNames.size(), topN) ;
-						for (String name : finalNames )
-							oReport += name+"\n";					
-					}
+			    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
+			    		// Initialize the table
 			    		
+			    		String tableColumnNames[] = {"Name", "Lowest Rank\n[in year]", "Highest Rank\n [in year]", "Trend"};
+			    		TableWrapper table = new TableWrapper(Arrays.asList(tableColumnNames));
+				   		
+				   		// Deal with data
+				   		List<String> finalNames = new ArrayList<>();
+						
+						// loop through all years for each name in name list
+						for (int i = 0; i < topN; i++) {
+							String name = AnalyzeNames.getName(yearFrom, i+1, gender);
+							int hiRank = i + 1;
+							int loRank = i + 1;
+							int hiYear = yearFrom;
+							int loYear = yearFrom;		
+							boolean inTopN = true;
+							for (int year=yearFrom + 1; year<=yearTo; year++) {
+								int rank = AnalyzeNames.getRank(year, name, gender);
+								// in each year, check whether the names rank is out of TopN 
+								if (rank > topN || rank == -1) {
+									inTopN = false;
+									break;
+								}
+								// update the highest/lowest rank/year
+								if (rank > loRank) {
+									loRank = rank;
+									loYear = year;
+								}
+								if (rank < hiRank) {
+									hiRank = rank;
+									hiYear = year;
+								}	
+							}
+							if (!inTopN)
+								continue;
+							// add items to the table
+							List<String> row = new ArrayList<>();
+							row.add(name);
+							row.add(Integer.toString(loRank)+"\n"+"["+ Integer.toString(loYear)+"]");
+							row.add(Integer.toString(hiRank)+"\n"+"["+ Integer.toString(hiYear)+"]");
+							if (hiYear == loYear)
+								row.add("FLAT");
+							else if(hiYear > loYear)
+								row.add("UP");
+							else
+								row.add("DOWN");
+									
+							table.addRow(row);
+							finalNames.add(name);
+						}
+						
+						if (finalNames.isEmpty()) {
+							oReport += String.format("Over the period %d to %d, no name maintained a high level of popularity within Top %d. \n", 
+					    			yearFrom, yearTo, topN) ;
+						} else {
+							// display the table
+							displayTable(table.getTable(), oReport);
+							
+							oReport += String.format("Over the period %d to %d, the %d names below maintained a high level of popularity within Top %d: \n", 
+									yearFrom, yearTo, finalNames.size(), topN) ;
+							for (String name : finalNames )
+								oReport += name+"\n";					
+						}
+				    		
+			    	} else {
+			    		oReport += "Error: Invalid Period. Please check your input years.\n";
+			    	}
 		    	} else {
-		    		oReport += "Error: Invalid Period. Please check your input years.\n";
-		    	}}
-	    	else {oReport += "Error: Invalid Top N. Please check your input Top N.\n";}
+		    		oReport += "Error: Invalid Top N. Please check your input Top N.\n";
+		    	}
 		    } catch (Exception e) {
 				oReport += "Error: Invalid Input. Please check your input values.\n";
 			}
@@ -564,7 +565,7 @@ public class Controller {
 					}
 				}
 			    else {
-						oReport +="Error: Year Out of Range. Please check your input year.\n" ;
+					oReport += "Error: Year Out of Range. Please check your input year.\n";
 			    }
 			} catch (Exception e) {
 				oReport += "Error: Invalid Input. Please check your input values.\n";
