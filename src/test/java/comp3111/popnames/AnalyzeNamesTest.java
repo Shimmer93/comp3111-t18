@@ -43,6 +43,20 @@ public class AnalyzeNamesTest {
     	assertTrue(name.equals("Desire"));
     }
     
+    @Test 
+    public void testGetMaxRankInPeriodMale() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	int result = a.getMaxRankInPeriod(2000, 2001, "M");
+    	assertEquals(result, 12295);
+    }
+    
+    @Test 
+    public void testGetMaxRankInPeriodFemale() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	int result = a.getMaxRankInPeriod(2000, 2001, "F");
+    	assertEquals(result, 17966);
+    }
+    
     @Test
     public void testRecommendBabyNameRanked() {
     	AnalyzeNames a = new AnalyzeNames();
@@ -55,6 +69,20 @@ public class AnalyzeNamesTest {
     	AnalyzeNames a = new AnalyzeNames();
     	Pair<String, String> result = a.recommendBabyName("Nobita", 1980, "Shizuka", 1982, 2000);
     	assertTrue(result.getKey().equals("Jacob") && result.getValue().equals("Emily"));
+    }
+    
+    @Test
+    public void testRecommendedMateNameRanked() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	String result = a.recommendedMateName("David", 1980, "M", "F", "Younger");
+    	assertEquals(result, "Sarah");
+    }
+    
+    @Test
+    public void testRecommendedMateNameNotRanked() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	String result = a.recommendedMateName("Suneo", 1980, "M", "F", "Younger");
+    	assertEquals(result, "Jennifer");
     }
     
     @Test

@@ -56,6 +56,12 @@ public class JavaFXTest extends ApplicationTest {
 		assertFalse(s1.equals(s2));
 	}
 	
+	public void testSummary() {
+		clickOn("#buttonSummary");
+		String s = t.getText();
+		assertTrue(s.startsWith("Summary"));
+	}
+	
 	
 	@Test
 	public void testTextAreaConsole() {	
@@ -83,19 +89,19 @@ public class JavaFXTest extends ApplicationTest {
 	}
 	
 	@Test
-	public void testRecommendBabyNameSuccess() {
-		clickOn("#tabApp1");
-		clickOn("#buttonGetRecom");
+	public void testReportNamePopularitySuccess() {
+		clickOn("#tabReport2");
+		clickOn("#buttonReport2");
 		String s = t.getText();
-		assertTrue(s.startsWith("Boy"));
+		assertTrue(s.startsWith("In"));
 	}
 	
 	@Test
-	public void testRecommendBabyNameFailure() {
-		clickOn("#tabApp1");
-		TextField tf = (TextField)s.lookup("#textFieldDadYOB");
+	public void testReportNamePopularityFailure() {
+		clickOn("#tabReport2");
+		TextField tf = (TextField)s.lookup("#textFieldFrom2");
 		tf.setText("wrong");
-		clickOn("#buttonGetRecom");
+		clickOn("#buttonReport2");
 		String s = t.getText();
 		assertTrue(s.startsWith("Error"));
 	}
@@ -119,11 +125,47 @@ public class JavaFXTest extends ApplicationTest {
 	}
 	
 	@Test
+	public void testRecommendBabyNameSuccess() {
+		clickOn("#tabApp1");
+		clickOn("#buttonGetRecom");
+		String s = t.getText();
+		assertTrue(s.startsWith("Boy"));
+	}
+	
+	@Test
+	public void testRecommendBabyNameFailure() {
+		clickOn("#tabApp1");
+		TextField tf = (TextField)s.lookup("#textFieldDadYOB");
+		tf.setText("wrong");
+		clickOn("#buttonGetRecom");
+		String s = t.getText();
+		assertTrue(s.startsWith("Error"));
+	}
+	
+	@Test
+	public void testGetRecommendedMateNameSuccess() {
+		clickOn("#tabApp2");
+		clickOn("#buttonRecommendation");
+		String s = t.getText();
+		assertTrue(s.startsWith("Recom"));
+	}
+	
+	@Test
+	public void testGetRecommendedMateNameFailure() {
+		clickOn("#tabApp2");
+		TextField tf = (TextField)s.lookup("#textFieldYOB");
+		tf.setText("wrong");
+		clickOn("#buttonRecommendation");
+		String s = t.getText();
+		assertTrue(s.startsWith("Error"));
+	}
+	
+	@Test
 	public void testGetCompalibaleScoreSuccess() {
 		clickOn("#tabApp3");
 		clickOn("#buttonGetScore");
 		String s = t.getText();
-		assertTrue(s.startsWith("E"));
+		assertTrue(s.startsWith("The"));
 	}
 	
 	@Test

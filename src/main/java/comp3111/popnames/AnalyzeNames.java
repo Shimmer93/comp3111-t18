@@ -243,7 +243,6 @@ public class AnalyzeNames {
 		 mateRank = (yourRank == -1 ? 1 : yourRank);		
 		 mateYOB = (preference.equals("Younger") ? YOB+1 : YOB-1);
 		 String mateName = getName(mateYOB, mateRank, mateGender);		 
-		 //System.out.println(preference+" "+preference.equals("Younger"));
 		 return mateName;
 	 }
 	 

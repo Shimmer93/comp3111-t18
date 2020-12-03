@@ -676,7 +676,7 @@ void getRecommendedMateName()
 			RadioButton pSelected = (RadioButton) Tpreference.getSelectedToggle();
 			String yourGender = Character.toString(ySelected.getText().charAt(0));
 			String mateGender = Character.toString(mSelected.getText().charAt(0));
-			String preference = Character.toString(pSelected.getText().charAt(0));
+			String preference = pSelected.getText();
 						
 			if (verifyYearInRange(YOB)) 
 			{
