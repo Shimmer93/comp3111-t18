@@ -110,10 +110,12 @@ public class AnalyzeNames {
 	 public static float compatibleScore (String iName, String iGender,int iYOB, String iNameMate, String iGenderMate, int oYOB) {
 		 int oRank = getRank(iYOB, iName, iGender);
 		 int oRankMate = getRank(oYOB, iNameMate, iGenderMate);
+		 // if not ranked, we assign 1 as the rank
 		 if (oRank == -1)
 			 oRank = 1;
 		 if (oRankMate == -1)
 			 oRankMate = 1;
+		 // we define the score as 1-|(oRank - oRankMate)|/max(oRank,oRankMate), which is in range (0,1]
 		 float oScore =1-Float.valueOf(Math.abs((oRank - oRankMate)))/Math.max(oRank,oRankMate); 
 		  
 		 return oScore;

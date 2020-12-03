@@ -444,7 +444,7 @@ public class Controller {
 		    	String gender = Character.toString(selected.getText().charAt(0));
 		    	int yearFrom = Integer.parseInt(textFieldFrom3.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo3.getText());
-		    	
+		    	if (topN >= 1) {
 		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
 		    		// Initialize the table
 		    		
@@ -498,7 +498,7 @@ public class Controller {
 					}
 					
 					if (finalNames.isEmpty()) {
-						oReport += String.format("Over the period %d to %d, no name maintained a high level of popularity within Top %d: \n", 
+						oReport += String.format("Over the period %d to %d, no name maintained a high level of popularity within Top %d. \n", 
 				    			yearFrom, yearTo, topN) ;
 					} else {
 						// display the table
@@ -511,8 +511,9 @@ public class Controller {
 					}
 			    		
 		    	} else {
-		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
-		    	}
+		    		oReport += "Error: Invalid Period. Please check your input years.\n";
+		    	}}
+	    	else {oReport += "Error: Invalid Top N. Please check your input Top N.\n";}
 		    } catch (Exception e) {
 				oReport += "Error: Invalid Input. Please check your input values.\n";
 			}

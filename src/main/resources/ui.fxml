@@ -100,7 +100,7 @@
                            <children>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="318.0" prefWidth="719.0">
                                  <children>
-                                    <TextArea editable="false" layoutX="118.0" layoutY="50.0" prefHeight="68.0" prefWidth="355.0" text="Generate a brief report in response to the queries on identifying the names that have maintained a high level of popularity within Top N over a given period.&#10;" wrapText="true" />
+                                    <TextArea editable="false" layoutX="118.0" layoutY="50.0" prefHeight="68.0" prefWidth="355.0" text="Generate a brief report in response to the queries on identifying the names that have maintained a high level of popularity within Top N over a given period." wrapText="true" />
                                     <Label layoutX="118.0" layoutY="131.0" text="Top N (N&gt;=1): " />
                                     <TextField fx:id="textFieldTopN3" layoutX="201.0" layoutY="127.0" prefHeight="26.0" prefWidth="35.0" text="10" />
                                     <Label layoutX="259.0" layoutY="131.0" text="Gender: " />
@@ -160,7 +160,7 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="412.0" prefWidth="719.0">
                            <children>
-                              <TextArea editable="false" layoutX="70.0" layoutY="26.0" prefHeight="31.0" prefWidth="355.0" text="Predicting scores for compatible pairs." wrapText="true" />
+                              <TextArea editable="false" layoutX="70.0" layoutY="26.0" prefHeight="44.0" prefWidth="500.0" text="Predicting scores for compatible pairs (0%: Not Compatible; 100%: Perfect Match).&#10;Both your birth year your preferred mate's birth year should be from 1880 to 2019."/>
                               <Label layoutX="72.0" layoutY="80.0" text="My name:" />
                               <Label layoutX="361.0" layoutY="80.0" text="My gender:" />
                               <Label layoutX="72.0" layoutY="110.0" text="My year of birth (1880 - 2019):" />
