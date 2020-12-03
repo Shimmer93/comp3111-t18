@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -58,7 +58,7 @@
                               <TextField fx:id="textFieldTo1" layoutX="336.0" layoutY="163.0" prefHeight="26.0" prefWidth="43.0" text="1945" />
                               <TextField fx:id="textFieldFrom1" layoutX="270.0" layoutY="163.0" prefHeight="26.0" prefWidth="43.0" text="1941" />
                               <Label layoutX="318.0" layoutY="167.0" text="to" />
-                              <Button layoutX="142.0" layoutY="204.0" mnemonicParsing="false" onAction="#reportTopNames" text="REPORT" />
+                              <Button fx:id="buttonReport1" layoutX="142.0" layoutY="204.0" mnemonicParsing="false" onAction="#reportTopNames" text="REPORT" />
                            </children>
                         </AnchorPane>
                     </content>
@@ -83,7 +83,7 @@
                                     <TextField fx:id="textFieldTo2" layoutX="298.0" layoutY="128.0" prefHeight="26.0" prefWidth="43.0" text="1945" />
                                     <TextField fx:id="textFieldFrom2" layoutX="232.0" layoutY="128.0" prefHeight="26.0" prefWidth="43.0" text="1941" />
                                     <Label layoutX="280.0" layoutY="132.0" text="to" />
-                                    <Button layoutX="108.0" layoutY="169.0" mnemonicParsing="false" onAction="#reportNamePopularity" text="REPORT" />
+                                    <Button fx:id="buttonReport2" layoutX="108.0" layoutY="169.0" mnemonicParsing="false" onAction="#reportNamePopularity" text="REPORT" />
                                  </children>
                               </AnchorPane>
                            </children>
@@ -111,7 +111,7 @@
                                     <TextField fx:id="textFieldTo3" layoutX="298.0" layoutY="163.0" prefHeight="26.0" prefWidth="43.0" text="1945" />
                                     <TextField fx:id="textFieldFrom3" layoutX="232.0" layoutY="163.0" prefHeight="26.0" prefWidth="43.0" text="1941" />
                                     <Label layoutX="280.0" layoutY="167.0" text="to" />
-                                    <Button layoutX="118.0" layoutY="206.0" mnemonicParsing="false" onAction="#reportNameTrend" text="REPORT" />
+                                    <Button fx:id="buttonReport3" layoutX="118.0" layoutY="206.0" mnemonicParsing="false" onAction="#reportNameTrend" text="REPORT" />
                                  </children>
                               </AnchorPane>
                            </children>
@@ -126,8 +126,8 @@
                               <Label layoutX="72.0" layoutY="131.0" text="Mom's name:" />
                               <Label layoutX="344.0" layoutY="103.0" text="Dad's year of birth:" />
                               <Label layoutX="344.0" layoutY="131.0" text="Mom's year of birth:" />
-                              <TextField fx:id="textFieldDadName" layoutX="162.0" layoutY="99.0" />
-                              <TextField fx:id="textFieldMomName" layoutX="162.0" layoutY="127.0" />
+                              <TextField fx:id="textFieldDadName" layoutX="162.0" layoutY="99.0" text="David" />
+                              <TextField fx:id="textFieldMomName" layoutX="162.0" layoutY="127.0" text="Mary" />
                               <RadioButton fx:id="radioWithVin" layoutX="72.0" layoutY="178.0" mnemonicParsing="false" onAction="#enableVin" selected="true" text="With vintage year">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="isWithVin" />
@@ -135,9 +135,9 @@
                               </RadioButton>
                               <RadioButton fx:id="radioWithoutVin" layoutX="72.0" layoutY="201.0" mnemonicParsing="false" onAction="#disableVin" text="Without vintage year" toggleGroup="$isWithVin" />
                               <Button fx:id="buttonGetRecom" layoutX="72.0" layoutY="249.0" mnemonicParsing="false" onAction="#getRecommendedBabyName" text="Get Recommendation" />
-                              <TextField fx:id="textFieldDadYOB" layoutX="470.0" layoutY="99.0" />
-                              <TextField fx:id="textFieldMomYOB" layoutX="470.0" layoutY="127.0" />
-                              <TextField fx:id="textFieldVin" layoutX="226.0" layoutY="174.0" />
+                              <TextField fx:id="textFieldDadYOB" layoutX="470.0" layoutY="99.0" text="1980" />
+                              <TextField fx:id="textFieldMomYOB" layoutX="470.0" layoutY="127.0" text="1983" />
+                              <TextField fx:id="textFieldVin" layoutX="226.0" layoutY="174.0" text="2000" />
                               <TextArea editable="false" layoutX="71.0" layoutY="31.0" prefHeight="44.0" prefWidth="396.0" text="Recommend a baby's name given information of the parents.&#10;All years should be from 1880 to 2019. " />
                            </children>
                         </AnchorPane>
@@ -149,24 +149,24 @@
                            <children>
                               <Label layoutX="72.0" layoutY="80.0" text="What is your name?" />
                               <Label layoutX="72.0" layoutY="108.0" text="Which year were you born? " />
-                              <TextField fx:id="textFieldYourName" layoutX="362.0" layoutY="76.0" />
-                              <TextField fx:id="textFieldYOB" layoutX="362.0" layoutY="104.0" />                              
+                              <TextField fx:id="textFieldYourName" layoutX="362.0" layoutY="76.0" text="David" />
+                              <TextField fx:id="textFieldYOB" layoutX="362.0" layoutY="104.0" text="2000" />                              
                               <Label layoutX="72.0" layoutY="140.0" text="What is your gender? " />
-                              <RadioButton fx:id="radioYouMale" layoutX="375.0" layoutY="140.0" mnemonicParsing="false"  text="Male">
+                              <RadioButton fx:id="radioYouMale" layoutX="375.0" layoutY="140.0" mnemonicParsing="false" selected="true" text="Male">
                                        <toggleGroup>
                                           <ToggleGroup fx:id="TyourGender" />
                                        </toggleGroup>
                               </RadioButton>
                               <RadioButton fx:id="radioYouFemale" layoutX="450.0" layoutY="140.0" mnemonicParsing="false" text="Female" toggleGroup="$TyourGender" />                             
                               <Label layoutX="72.0" layoutY="170.0" text="Which gender of your mate do you prefer? " />
-                              <RadioButton fx:id="radioMateMale" layoutX="375.0" layoutY="170.0" mnemonicParsing="false"  text="Male">
+                              <RadioButton fx:id="radioMateMale" layoutX="375.0" layoutY="170.0" mnemonicParsing="false" text="Male">
                                        <toggleGroup>
                                           <ToggleGroup fx:id="TmateGender" />
                                        </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="radioMateFemale" layoutX="450.0" layoutY="170.0" mnemonicParsing="false" text="Female" toggleGroup="$TmateGender" />                              
+                              <RadioButton fx:id="radioMateFemale" layoutX="450.0" layoutY="170.0" mnemonicParsing="false" selected="true" text="Female" toggleGroup="$TmateGender" />                              
                               <Label layoutX="72.0" layoutY="200.0" text="Do you prefer younger or older mate? " />
-                              <RadioButton fx:id="radioYoung" layoutX="375.0" layoutY="200.0" mnemonicParsing="false" text="Younger">
+                              <RadioButton fx:id="radioYoung" layoutX="375.0" layoutY="200.0" mnemonicParsing="false" selected="true" text="Younger">
                                        <toggleGroup>
                                           <ToggleGroup fx:id="Tpreference" />
                                        </toggleGroup>
@@ -182,7 +182,7 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="412.0" prefWidth="719.0">
                            <children>
-                              <TextArea editable="false" layoutX="70.0" layoutY="26.0" prefHeight="44.0" prefWidth="500.0" text="Predicting scores for compatible pairs (0%: Not Compatible; 100%: Perfect Match).&#10;Both your birth year your preferred mate's birth year should be from 1880 to 2019."/>
+                              <TextArea editable="false" layoutX="70.0" layoutY="26.0" prefHeight="44.0" prefWidth="500.0" text="Predicting scores for compatible pairs (0%: Not Compatible; 100%: Perfect Match).&#10;Both your birth year your preferred mate's birth year should be from 1880 to 2019." />
                               <Label layoutX="72.0" layoutY="80.0" text="My name:" />
                               <Label layoutX="361.0" layoutY="80.0" text="My gender:" />
                               <Label layoutX="72.0" layoutY="110.0" text="My year of birth (1880 - 2019):" />

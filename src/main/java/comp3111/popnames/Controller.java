@@ -6,10 +6,6 @@ package comp3111.popnames;
 import java.util.*;
 import java.util.Map.Entry;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -254,7 +250,7 @@ public class Controller {
     boolean verifyYearInRange(int ... is) {
     	boolean result = true;
     	for (int i : is) {
-    		if (i > 2019 || i < 1880) {
+    		if (i > AnalyzeNames.MAX_YEAR || i < AnalyzeNames.MIN_YEAR) {
     			result = false;
     			break;
     		}
@@ -262,12 +258,13 @@ public class Controller {
     	return result;
     }
 
-    void displayTable(TableView<?> table, String oReport) {
+    String displayTable(TableView<?> table, String oReport) {
     	try {
 	    	FXMLLoader loader = new FXMLLoader();
 	    	loader.setLocation(getClass().getResource("/table.fxml"));
 	   		Pane root = (Pane) loader.load();
 	   		table.prefWidthProperty().bind(root.widthProperty());
+	   		table.prefHeightProperty().bind(root.heightProperty());
 			root.getChildren().add(table);
 	   		Scene scene = new Scene(root);
 	   		Stage stage = new Stage();
@@ -277,6 +274,7 @@ public class Controller {
     	} catch(Exception e) {
     		oReport += "Error: Cannot Display Table. Please contact the developer if this message is seen.";
     	}
+    	return oReport;
     }
     
     /**
@@ -381,48 +379,45 @@ public class Controller {
 		    	int yearFrom = Integer.parseInt(textFieldFrom1.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo1.getText());
 		    	
-		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
-		    		// Initialize the table
-		    		List<String> tableColumnNames = new ArrayList<>();
-		    		for (int i=0; i<=topN; i++)
-		    			tableColumnNames.add(i == 0 ? "Year" : String.format("Top %d", i));
-		    		TableWrapper table = new TableWrapper(tableColumnNames);
-			   		
-			   		// Deal with data
-			   		Map<String, Integer> nameCounts = new TreeMap<String, Integer>();
-					for (int year=yearFrom; year<=yearTo; year++) {
-						// Count the times of top spots
-						String name = AnalyzeNames.getName(year, 1, gender);
-						if (nameCounts.containsKey(name))
-							nameCounts.replace(name, nameCounts.get(name)+1);
-						else
-							nameCounts.put(name, 1);
-						
-						// add items to the table
-						List<String> names = new ArrayList<>();
-						names.add(Integer.toString(year));
-						for (int i=1; i<=topN; i++) {
-							String namei = AnalyzeNames.getName(year, i, gender);
-							names.add(namei);
-						}
-						table.addRow(names);
-					}
-					
-					// display the table
-					displayTable(table.getTable(), oReport);
-			    	
-					// Compute the name with most top spots
-			    	Entry<String, Integer> maxNameCount = Collections.max(nameCounts.entrySet(), new Comparator<Entry<String, Integer>>() {
-			            public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2) {
-			                return e1.getValue()
-			                    .compareTo(e2.getValue());
-			            }
-			        });
-			    	
-			    	oReport += String.format("Over the period %d to %d, %s for %s has hold the top spot most often for a total of %d times.\n", 
-			    			yearFrom, yearTo, maxNameCount.getKey(), gender.toLowerCase(), maxNameCount.getValue());
+		    	if (topN >= 1) {
+			    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
+			    		int maxRank = AnalyzeNames.getMaxRankInPeriod(yearFrom, yearTo, gender);
+			    		if (topN <= maxRank) {
+			    			// Initialize the table
+				    		List<String> tableColumnNames = new ArrayList<>();
+				    		for (int i=0; i<=topN; i++)
+				    			tableColumnNames.add(i == 0 ? "Year" : String.format("Top %d", i));
+				    		TableWrapper table = new TableWrapper(tableColumnNames);
+					   		
+					   		// Deal with data
+							for (int year=yearFrom; year<=yearTo; year++) {			
+								List<String> names = new ArrayList<>();
+								names.add(Integer.toString(year));
+								
+								for (int i=1; i<=topN; i++) {
+									// add items to the table
+									String name = AnalyzeNames.getName(year, i, gender);
+									names.add(name);
+								}
+								table.addRow(names);
+							}
+							
+							// display the table
+							oReport = displayTable(table.getTable(), oReport);
+					    	
+							// Compute the name with most top spots
+					    	Entry<String, Integer> maxNameCount = AnalyzeNames.getMaxNameCount(yearFrom, yearTo, gender);
+					    	
+					    	oReport += String.format("Over the period %d to %d, %s for %s has hold the top spot most often for a total of %d times.\n", 
+					    			yearFrom, yearTo, maxNameCount.getKey(), selected.getText().toLowerCase(), maxNameCount.getValue());
+			    		} else {
+			    			oReport += String.format("Error: TopN Value Too Large. Please make sure your input topN value is not larger than %d. \n", maxRank);
+			    		}
+			    	} else {
+			    		oReport += "Error: Year Out of Range. Please check your input years.\n";
+			    	}
 		    	} else {
-		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
+		    		oReport += "Error: Non-positive TopN. Please check your input topN value.\n";
 		    	}
 		    } catch (Exception e) {
 				oReport += "Error: Invalid Input. Please check your input values.\n";
@@ -435,9 +430,6 @@ public class Controller {
     	textAreaConsole.setText(oReport);
     }
     
-    
-    
-    
     /**
      * Task Two
      * To be triggered by the "Report" button on the Task Two (Reporting 2) Tab
@@ -447,7 +439,6 @@ public class Controller {
     void reportNamePopularity() 
     {
     	String oReport = "";
-    	
     	if (verifyInputNotEmpty(textFieldName, textFieldFrom2, textFieldTo2)) 
     	{
 	    	try 
@@ -456,82 +447,63 @@ public class Controller {
 	    		String name = textFieldName.getText();
 		    	//String name = String.parseString(textFieldName.getText());
 		    	RadioButton selected = (RadioButton) T11.getSelectedToggle();
-		    	String gender = selected.getText();
+		    	String gender = Character.toString(selected.getText().charAt(0));
 		    	int yearFrom = Integer.parseInt(textFieldFrom2.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo2.getText());
 		    	
-		    	if (verifyYearInRange(yearFrom, yearTo)) 
+		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) 
 		    	{
 		    		if(yearFrom>yearTo)
 		    			oReport +="Invalid year range. Lower bound year should not be larger than upper bound year.";
 		    		else
 		    		{
 		    		// Initialize the table
-		    		TableView<List<String>> table = new TableView<>();
-			   		for (int i=0; i<4; i++) 
-			   		{
-			   			final int index = i;
-			   			TableColumn<List<String>, String> tableColumn = new TableColumn<List<String>, String>(index == 0 ? "Year" :(index == 1? "Rank" :(index==2? "Count":"Percentage")));
-			   			tableColumn.setCellValueFactory(new Callback<CellDataFeatures<List<String>, String>, ObservableValue<String>>() 
-			   			{
-			   			    @Override
-			   			    public ObservableValue<String> call(CellDataFeatures<List<String>, String> data) 
-			   			    {
-			   			        return new ReadOnlyStringWrapper(data.getValue().get(index)) ;
-			   			    }
-			   			});
-			   			table.getColumns().add(tableColumn);
-			   		}
+	    			String tableColumnNames[] = {"Year", "Rank","Count","Percentage"};
+		    		TableWrapper table = new TableWrapper(Arrays.asList(tableColumnNames));
 			   		
 			   		// Deal with data
 			   		
-			   		final ObservableList<List<String>> tableItems = FXCollections.observableArrayList();
-			   		
-			   		
 					for (int year=yearFrom; year<=yearTo; year++) 
 					{
-						
-						
 						// add items to the table
 						List<String> popularity = new ArrayList<>();
 						popularity.add(Integer.toString(year));
 						
-						int rank=AnalyzeNames.getRank(year, name, Character.toString(gender.charAt(0)));
+						int rank=AnalyzeNames.getRank(year, name, gender);
 						popularity.add(Integer.toString(rank));
 					
-						int count=AnalyzeNames.getNameCount(year, name, Character.toString(gender.charAt(0)));
+						int count=AnalyzeNames.getNameCount(year, name, gender);
 						popularity.add(Integer.toString(count));
 							
-						double percentage=AnalyzeNames.getNamePercentage(year, name, Character.toString(gender.charAt(0)));;
+						double percentage=AnalyzeNames.getNamePercentage(year, name, gender);;
 						popularity.add(Double.toString(percentage));
 		
-						tableItems.add(popularity);
+						table.addRow(popularity);
 					}
-					table.setItems(tableItems);
 					
 					// display the table
-					displayTable(table, oReport);
+					oReport = displayTable(table.getTable(), oReport);
 			    								    	
-			    	int mostPopularYear=AnalyzeNames.getMostPopularYear(yearFrom,yearTo,name,Character.toString(gender.charAt(0)));
+			    	int mostPopularYear=AnalyzeNames.getMostPopularYear(yearFrom, yearTo, name, gender);
 			    	
 			    	
 			    	oReport += String.format("In the year %d, the number of birth with name %s is %d, which represents %.2f percent of total %s births in %d.\nThe year when the name %s was most popular is %d.\nIn that year, the number of births is %d, which represents %.2f percent of the total %s birth in %d.\n", 
-			    			 yearTo,name,AnalyzeNames.getNameCount(yearTo, name, Character.toString(gender.charAt(0))),AnalyzeNames.getNamePercentage(yearTo, name, Character.toString(gender.charAt(0))),gender,yearTo,name,mostPopularYear,AnalyzeNames.getNameCount(mostPopularYear, name, Character.toString(gender.charAt(0))),AnalyzeNames.getNamePercentage(mostPopularYear, name, Character.toString(gender.charAt(0))),gender,mostPopularYear);
+			    			 yearTo, name, AnalyzeNames.getNameCount(yearTo, name, gender), 
+			    			 AnalyzeNames.getNamePercentage(yearTo, name, gender), selected.getText(), yearTo, name, mostPopularYear, 
+			    			 AnalyzeNames.getNameCount(mostPopularYear, name, gender), 
+			    			 AnalyzeNames.getNamePercentage(mostPopularYear, name, gender), gender, mostPopularYear);
 			    	
+		    		}
 		    	}
-		    	}
-		    	
 		    	else 
 		    	{
 		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
 		    	}
-		    
 		    } catch (Exception e) 
 	    	{
 				oReport += "Error: Invalid Input. Please check your input values.\n";
 			}
 		} 
-    	
     	else 
 		{
 			oReport += "Error: Empty Input. Please fill in all the text fields.\n";
@@ -540,10 +512,6 @@ public class Controller {
     	// Show summary and error messages in the console
     	textAreaConsole.setText(oReport);
     }
-
-    
-    
-    
 
     /**
      * Task Three
@@ -563,75 +531,64 @@ public class Controller {
 		    	int yearFrom = Integer.parseInt(textFieldFrom3.getText());
 		    	int yearTo = Integer.parseInt(textFieldTo3.getText());
 		    	if (topN >= 1) {
-		    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
-		    		// Initialize the table
-		    		
-		    		String tableColumnNames[] = {"Name", "Lowest Rank\n[in year]", "Highest Rank\n [in year]", "Trend"};
-		    		TableWrapper table = new TableWrapper(Arrays.asList(tableColumnNames));
-			   		
-			   		// Deal with data
-			   		List<String> finalNames = new ArrayList<>();
-					
-					// loop through all years for each name in name list
-					for (int i = 0; i < topN; i++) {
-						String name = AnalyzeNames.getName(yearFrom, i+1, gender);
-						int hiRank = i + 1;
-						int loRank = i + 1;
-						int hiYear = yearFrom;
-						int loYear = yearFrom;		
-						boolean inTopN = true;
-						for (int year=yearFrom + 1; year<=yearTo; year++) {
-							int rank = AnalyzeNames.getRank(year, name, gender);
-							// in each year, check whether the names rank is out of TopN 
-							if (rank > topN || rank == -1) {
-								inTopN = false;
-								break;
+			    	if (verifyYearInRange(yearFrom, yearTo) && yearFrom < yearTo) {
+			    		int maxRank = AnalyzeNames.getMaxRankInPeriod(yearFrom, yearTo, gender);
+			    		if (topN <= maxRank) {
+			    			// Initialize the table
+				    		
+				    		String tableColumnNames[] = {"Name", "Lowest Rank\n[in year]", "Highest Rank\n [in year]", "Trend"};
+				    		TableWrapper table = new TableWrapper(Arrays.asList(tableColumnNames));
+					   		
+					   		// Deal with data
+					   		List<String> finalNames = new ArrayList<>();
+							
+							// loop through all years for each name in name list
+							for (int i = 0; i < topN; i++) {
+								String name = AnalyzeNames.getName(yearFrom, i+1, gender);
+								int result[] = AnalyzeNames.getHighAndLowRank(yearFrom, yearTo, name, gender);
+								int hiRank = result[0];
+								int hiYear = result[1];
+								int loRank = result[2];
+								int loYear = result[3];
+								// add items to the table
+								if (loRank <= topN && loRank != -1) {
+									List<String> row = new ArrayList<>();
+									row.add(name);
+									row.add(Integer.toString(loRank)+"\n"+"["+ Integer.toString(loYear)+"]");
+									row.add(Integer.toString(hiRank)+"\n"+"["+ Integer.toString(hiYear)+"]");
+									if (hiYear == loYear)
+										row.add("FLAT");
+									else if(hiYear > loYear)
+										row.add("UP");
+									else
+										row.add("DOWN");
+											
+									table.addRow(row);
+									finalNames.add(name);
+								}
 							}
-							// update the highest/lowest rank/year
-							if (rank > loRank) {
-								loRank = rank;
-								loYear = year;
-							}
-							if (rank < hiRank) {
-								hiRank = rank;
-								hiYear = year;
-							}	
-						}
-						if (!inTopN)
-							continue;
-						// add items to the table
-						List<String> row = new ArrayList<>();
-						row.add(name);
-						row.add(Integer.toString(loRank)+"\n"+"["+ Integer.toString(loYear)+"]");
-						row.add(Integer.toString(hiRank)+"\n"+"["+ Integer.toString(hiYear)+"]");
-						if (hiYear == loYear)
-							row.add("FLAT");
-						else if(hiYear > loYear)
-							row.add("UP");
-						else
-							row.add("DOWN");
+							
+							if (finalNames.isEmpty()) {
+								oReport += String.format("Over the period %d to %d, no name maintained a high level of popularity within Top %d. \n", 
+						    			yearFrom, yearTo, topN) ;
+							} else {
+								// display the table
+								oReport = displayTable(table.getTable(), oReport);
 								
-						table.addRow(row);
-						finalNames.add(name);
-					}
-					
-					if (finalNames.isEmpty()) {
-						oReport += String.format("Over the period %d to %d, no name maintained a high level of popularity within Top %d. \n", 
-				    			yearFrom, yearTo, topN) ;
-					} else {
-						// display the table
-						displayTable(table.getTable(), oReport);
-						
-						oReport += String.format("Over the period %d to %d, the %d names below maintained a high level of popularity within Top %d: \n", 
-								yearFrom, yearTo, finalNames.size(), topN) ;
-						for (String name : finalNames )
-							oReport += name+"\n";					
-					}
-			    		
+								oReport += String.format("Over the period %d to %d, the %d names below maintained a high level of popularity within Top %d. \n", 
+										yearFrom, yearTo, finalNames.size(), topN) ;
+								for (String name : finalNames )
+									oReport += name+"\n";					
+							}
+			    		} else {
+			    			oReport += String.format("Error: TopN Value Too Large. Please make sure your input topN value is not larger than %d. \n", maxRank);
+			    		}	
+			    	} else {
+			    		oReport += "Error: Invalid Period. Please check your input years.\n";
+			    	}
 		    	} else {
-		    		oReport += "Error: Invalid Period. Please check your input years.\n";
-		    	}}
-	    	else {oReport += "Error: Invalid Top N. Please check your input Top N.\n";}
+		    		oReport += "Error: Invalid Top N. Please check your input Top N.\n";
+		    	}
 		    } catch (Exception e) {
 				oReport += "Error: Invalid Input. Please check your input values.\n";
 			}
@@ -643,7 +600,6 @@ public class Controller {
     	textAreaConsole.setText(oReport);
     }
 
-    
 
     /**
      * Task Four
@@ -699,7 +655,6 @@ public class Controller {
     }
 
 
-
 /**
  * Task Five
  * To be triggered by the "Get Recommendation" button on the Task Five (Application 5) Tab
@@ -719,16 +674,15 @@ void getRecommendedMateName()
 			RadioButton ySelected = (RadioButton) TyourGender.getSelectedToggle();
 			RadioButton mSelected = (RadioButton) TmateGender.getSelectedToggle();
 			RadioButton pSelected = (RadioButton) Tpreference.getSelectedToggle();
-			String yourGender = ySelected.getText();
-			String mateGender = mSelected.getText();
+			String yourGender = Character.toString(ySelected.getText().charAt(0));
+			String mateGender = Character.toString(mSelected.getText().charAt(0));
 			String preference = pSelected.getText();
 						
 			if (verifyYearInRange(YOB)) 
 			{
 				// Compute recommended names
-				String mateName=AnalyzeNames.recommendedMateName(yourName, YOB, Character.toString(yourGender.charAt(0)), Character.toString(mateGender.charAt(0)),preference);		
+				String mateName = AnalyzeNames.recommendedMateName(yourName, YOB, yourGender, mateGender, preference);		
 				oReport = String.format("Recommended mate name: %s\n", mateName);
-				
 			} 
 			else 
 			{
@@ -747,10 +701,6 @@ void getRecommendedMateName()
 	
 	textAreaConsole.setText(oReport);
 }
-
-
-
-
 
 
 /**
@@ -793,7 +743,7 @@ void getRecommendedMateName()
 					}
 				}
 			    else {
-						oReport +="Error: Year Out of Range. Please check your input year.\n" ;
+					oReport += "Error: Year Out of Range. Please check your input year.\n";
 			    }
 			} catch (Exception e) {
 				oReport += "Error: Invalid Input. Please check your input values.\n";
