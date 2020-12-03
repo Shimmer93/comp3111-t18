@@ -194,7 +194,7 @@ public class Controller {
     boolean verifyYearInRange(int ... is) {
     	boolean result = true;
     	for (int i : is) {
-    		if (i > 2019 || i < 1880) {
+    		if (i > AnalyzeNames.MAX_YEAR || i < AnalyzeNames.MIN_YEAR) {
     			result = false;
     			break;
     		}
@@ -415,7 +415,7 @@ public class Controller {
 				String momName = textFieldMomName.getText();
 				int dadYOB = Integer.parseInt(textFieldDadYOB.getText());
 				int momYOB = Integer.parseInt(textFieldMomYOB.getText());	
-				int vintageYear = radioWithVin.isSelected() ? Integer.parseInt(textFieldVin.getText()) : 2019;
+				int vintageYear = radioWithVin.isSelected() ? Integer.parseInt(textFieldVin.getText()) : AnalyzeNames.MAX_YEAR;
 				
 				if (verifyYearInRange(dadYOB, momYOB, vintageYear)) {
 					// Compute recommended names

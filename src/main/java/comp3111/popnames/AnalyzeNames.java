@@ -5,7 +5,10 @@ import edu.duke.*;
 import javafx.util.Pair;
 
 public class AnalyzeNames {
-
+	
+	final public static int MIN_YEAR = 1800;
+	final public static int MAX_YEAR = 2019;
+			
 	public static CSVParser getFileParser(int year) {
      FileResource fr = new FileResource(String.format("dataset/yob%s.csv", year));
      return fr.getCSVParser(false);
@@ -118,6 +121,7 @@ public class AnalyzeNames {
 	 public static Pair<String, String> recommendBabyName(String dadName, int dadYOB, String momName, int momYOB, int vintageYear) {
 		 int dadRank = getRank(dadYOB, dadName, "M");
 		 int momRank = getRank(momYOB, momName, "F");
+		// if not ranked, we assign 1 as the rank
 		 if (dadRank == -1)
 			 dadRank = 1;
 		 if (momRank == -1)

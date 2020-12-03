@@ -63,5 +63,76 @@ public class JavaFXTest extends ApplicationTest {
 		String s = t.getText();
 		assertTrue(s.equals("David"));
 	}
-		
+	
+	@Test
+	public void testReportTopNamesSuccess() {
+		clickOn("#tabReport1");
+		clickOn("#buttonReport1");
+		String s = t.getText();
+		assertTrue(s.startsWith("Over"));
+	}
+	
+	@Test
+	public void testReportTopNamesFailure() {
+		clickOn("#tabReport1");
+		TextField tf = (TextField)s.lookup("#textFieldTopN1");
+		tf.setText("wrong");
+		clickOn("#buttonReport1");
+		String s = t.getText();
+		assertTrue(s.startsWith("Error"));
+	}
+	
+	@Test
+	public void testRecommendBabyNameSuccess() {
+		clickOn("#tabApp1");
+		clickOn("#buttonGetRecom");
+		String s = t.getText();
+		assertTrue(s.startsWith("Boy"));
+	}
+	
+	@Test
+	public void testRecommendBabyNameFailure() {
+		clickOn("#tabApp1");
+		TextField tf = (TextField)s.lookup("#textFieldDadYOB");
+		tf.setText("wrong");
+		clickOn("#buttonGetRecom");
+		String s = t.getText();
+		assertTrue(s.startsWith("Error"));
+	}
+	
+	@Test
+	public void testReportNameTrendSuccess() {
+		clickOn("#tabReport3");
+		clickOn("#buttonReport3");
+		String s = t.getText();
+		assertTrue(s.startsWith("Over"));
+	}
+	
+	@Test
+	public void testReportNameTrendFailure() {
+		clickOn("#tabReport3");
+		TextField tf = (TextField)s.lookup("#textFieldTopN3");
+		tf.setText("wrong");
+		clickOn("#buttonReport3");
+		String s = t.getText();
+		assertTrue(s.startsWith("Error"));
+	}
+	
+	@Test
+	public void testGetCompalibaleScoreSuccess() {
+		clickOn("#tabApp3");
+		clickOn("#buttonGetScore");
+		String s = t.getText();
+		assertTrue(s.startsWith("E"));
+	}
+	
+	@Test
+	public void testGetCompalibaleScoreFailure() {
+		clickOn("#tabApp3");
+		TextField tf = (TextField)s.lookup("#textFieldiYOB");
+		tf.setText("wrong");
+		clickOn("#buttonGetScore");
+		String s = t.getText();
+		assertTrue(s.startsWith("Error"));
+	}
 }

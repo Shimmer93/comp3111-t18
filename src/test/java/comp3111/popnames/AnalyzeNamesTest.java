@@ -1,6 +1,9 @@
 package comp3111.popnames;
 
 import org.junit.Test;
+
+import javafx.util.Pair;
+
 import static org.junit.Assert.*;
 
 public class AnalyzeNamesTest {
@@ -38,6 +41,34 @@ public class AnalyzeNamesTest {
     	AnalyzeNames a = new AnalyzeNames();
     	String name = a.getName(2019, 2192, "F");
     	assertTrue(name.equals("Desire"));
+    }
+    
+    @Test
+    public void testRecommendBabyNameRanked() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	Pair<String, String> result = a.recommendBabyName("David", 1980, "Helen", 1982, 2000);
+    	assertTrue(result.getKey().equals("Joshua") && result.getValue().equals("Madeleine"));
+    }
+    
+    @Test
+    public void testRecommendBabyNameNotRanked() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	Pair<String, String> result = a.recommendBabyName("Nobita", 1980, "Shizuka", 1982, 2000);
+    	assertTrue(result.getKey().equals("Jacob") && result.getValue().equals("Emily"));
+    }
+    
+    @Test
+    public void testCompatibleScoreRanked() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	float score = a.compatibleScore("Bob", "M", 1949, "Mary", "F", 1950);
+    	assertTrue(score - 0.01234567 < 1e-8 && score - 0.01234567 > -1e-8);
+    }
+    
+    @Test
+    public void testCompatibleScoreNotRanked() {
+    	AnalyzeNames a = new AnalyzeNames();
+    	float score = a.compatibleScore("Doraemon", "F", 1949, "Hellokitty", "M", 1950);
+    	assertTrue(score == 1);
     }
 
 }
