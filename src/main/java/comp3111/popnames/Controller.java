@@ -137,6 +137,42 @@ public class Controller {
 
     @FXML
     private Tab tabApp2;
+    
+    @FXML
+    private TextField textFieldYourName;
+    
+    @FXML
+    private TextField textFieldYOB;
+           
+    @FXML
+    private ToggleGroup TyourGender;
+    
+    @FXML
+    private ToggleGroup TmateGender;
+    
+    @FXML
+    private ToggleGroup Tpreference;
+    
+    @FXML
+    private RadioButton radioYouMale;
+    
+    @FXML
+    private RadioButton radioYouFemale;
+    
+    @FXML
+    private RadioButton radioMateMale;
+    
+    @FXML
+    private RadioButton radioMateFemale;
+    
+    @FXML
+    private RadioButton radioYoung;
+    
+    @FXML
+    private RadioButton radioOld;
+    
+    @FXML
+    private Button buttonRecommend;
 
     @FXML
     private Tab tabApp3;
@@ -429,7 +465,7 @@ public class Controller {
 					displayTable(table, oReport);
 			    								    	
 			    	int mostPopularYear=AnalyzeNames.getMostPopularYear(yearFrom,yearTo,name,Character.toString(gender.charAt(0)));
-			    	System.out.println(mostPopularYear);
+			    	
 			    	
 			    	oReport += String.format("In the year %d, the number of birth with name %s is %d, which represents %.2f percent of total %s births in %d.\nThe year when the name %s was most popular is %d.\nIn that year, the number of births is %d, which represents %.2f percent of the total %s birth in %d.\n", 
 			    			 yearTo,name,AnalyzeNames.getNameCount(yearTo, name, Character.toString(gender.charAt(0))),AnalyzeNames.getNamePercentage(yearTo, name, Character.toString(gender.charAt(0))),gender,yearTo,name,mostPopularYear,AnalyzeNames.getNameCount(mostPopularYear, name, Character.toString(gender.charAt(0))),AnalyzeNames.getNamePercentage(mostPopularYear, name, Character.toString(gender.charAt(0))),gender,mostPopularYear);
@@ -513,4 +549,59 @@ public class Controller {
     	textAreaConsole.setText(oReport);
     }
     
+
+
+
+
+/**
+ * Task Five
+ * To be triggered by the "Get Recommendation" button on the Task Five (Application 5) Tab
+ * 
+ */
+
+
+@FXML
+void getRecommendedMateName() 
+{
+	String oReport = "";
+	
+	if (verifyInputNotEmpty(textFieldYourName, textFieldYOB))
+	{		
+		try {
+			// Initialize values
+			String yourName = textFieldYourName.getText();
+			int YOB = Integer.parseInt(textFieldYOB.getText());
+			RadioButton ySelected = (RadioButton) TyourGender.getSelectedToggle();
+			RadioButton mSelected = (RadioButton) TmateGender.getSelectedToggle();
+			RadioButton pSelected = (RadioButton) Tpreference.getSelectedToggle();
+			String yourGender = ySelected.getText();
+			String mateGender = mSelected.getText();
+			String preference = pSelected.getText();
+						
+			if (verifyYearInRange(YOB)) 
+			{
+				// Compute recommended names
+				String mateName=AnalyzeNames.recommendedMateName(yourName, YOB, Character.toString(yourGender.charAt(0)), Character.toString(mateGender.charAt(0)),preference);
+		
+				oReport = String.format("Recommended mate name: %s\n", mateName);
+				
+			} 
+			else 
+			{
+				oReport += "Error: Year Out of Range. Please check your input years.\n";
+			}
+		} 
+		catch (Exception e) 
+		{
+			oReport += "Error: Invalid Input. Please check your input values.\n";
+		}
+	} 
+	else 
+	{
+		oReport += "Error: Empty Input. Please fill in all the text fields.\n";
+	}
+	
+	textAreaConsole.setText(oReport);
+}
+
 }

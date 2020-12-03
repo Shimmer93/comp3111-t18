@@ -95,7 +95,9 @@ public class AnalyzeNames {
 	     	return "information on the name at the specified rank is not available";
 	 }
 	 
-	 public static int getNameCount(int year, String name, String gender) 
+	 
+	 
+	 public static int getNameCount(int year, String name, String gender) //auxiliary function for task 2
 	 {
 
 	 	int count = 0;
@@ -116,7 +118,7 @@ public class AnalyzeNames {
 	    return count;
 	 }
 
-	 public static double getNamePercentage(int year, String name, String gender)
+	 public static double getNamePercentage(int year, String name, String gender) //auxiliary function for task 2
 	 {
 		 double percentage;
 		 int sum = 0;
@@ -135,7 +137,7 @@ public class AnalyzeNames {
 	    return percentage;
 	 }
 	 
-	 public static int getMostPopularYear(int yearFrom, int yearTo, String name, String gender)
+	 public static int getMostPopularYear(int yearFrom, int yearTo, String name, String gender) //auxiliary function for task 2
 	 {
 		 
 		 int mostPopularYear=yearFrom;
@@ -153,6 +155,7 @@ public class AnalyzeNames {
 		 else
 			 return mostPopularYear;
 	 }
+	 
 	 public static Pair<String, String> recommendBabyName(String dadName, int dadYOB, String momName, int momYOB, int vintageYear) {
 		 int dadRank = getRank(dadYOB, dadName, "M");
 		 int momRank = getRank(momYOB, momName, "F");
@@ -164,5 +167,30 @@ public class AnalyzeNames {
 		 String girlName = getName(vintageYear, momRank, "F");
 		 return new Pair<String, String>(boyName, girlName);
 	 }
+	 
+	 public static String recommendedMateName(String yourName, int YOB, String yourGender, String mateGender, String preference) //NK-T5 algorithm for task 5
+	 {
+		
+		 int mateRank;
+		 int mateYOB;
+		 int yourRank=getRank(YOB,yourName,yourGender);	
+		 String younger=new String("Younger");
+		 mateRank=(yourRank==-1?66:yourRank);		
+		 mateYOB=(preference.equals(younger)?YOB+1:YOB-1);
+		 String mateName=getName(mateYOB, mateRank,mateGender);		 
+		 System.out.println(preference+" "+preference.equals(younger));
+		 return mateName;
+	 }
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
 	 
 }

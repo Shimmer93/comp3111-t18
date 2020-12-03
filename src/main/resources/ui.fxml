@@ -78,7 +78,7 @@
                                           <ToggleGroup fx:id="T11" />
                                        </toggleGroup>
                                     </RadioButton>
-                                    <RadioButton fx:id="radioFemale2" layoutX="384.0" layoutY="93.0" mnemonicParsing="false" text="Female" toggleGroup="$T1" />
+                                    <RadioButton fx:id="radioFemale2" layoutX="384.0" layoutY="93.0" mnemonicParsing="false" text="Female" toggleGroup="$T11" />
                                     <Label layoutX="109.0" layoutY="132.0" text="Period (1880 - 2019): " />
                                     <TextField fx:id="textFieldTo2" layoutX="298.0" layoutY="128.0" prefHeight="26.0" prefWidth="43.0" text="1945" />
                                     <TextField fx:id="textFieldFrom2" layoutX="232.0" layoutY="128.0" prefHeight="26.0" prefWidth="43.0" text="1941" />
@@ -147,7 +147,38 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <TextArea layoutX="40.0" layoutY="27.0" prefHeight="242.0" prefWidth="638.0" text="Develop and implement an online service using empirical data to help make informed decisions on predicting names for compatible pairs.  Sample Scenario of Application: (i) A person seeking advices on identifying the name of a person of a different gender who would become his/her soulmate; (ii) A person seeking advices on identifying the name of a person of the same gender who would become his/her soulmate.&#10;&#10;Input&#10;* iName, iGender, iYOB: Particulars of the person seeking advices&#10;* iGenderMate: Specify the gender of the soulmate to be matched&#10;* iPreference: Specify the preference on having a younger or older soulmate&#10;&#10;Output&#10;* oName: Recommended name of the soulmate according to the NK-T5 Algorithm&#10;* plus, WOW factor on user experience and algorithm design!" wrapText="true" />
+                              <Label layoutX="72.0" layoutY="80.0" text="What is your name?" />
+                              <Label layoutX="72.0" layoutY="108.0" text="Which year were you born? " />
+                              <TextField fx:id="textFieldYourName" layoutX="362.0" layoutY="76.0" />
+                              <TextField fx:id="textFieldYOB" layoutX="362.0" layoutY="104.0" />
+                              
+                              <Label layoutX="72.0" layoutY="140.0" text="What is your gender? " />
+                              <RadioButton fx:id="radioYouMale" layoutX="375.0" layoutY="140.0" mnemonicParsing="false"  text="Male">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="TyourGender" />
+                                       </toggleGroup>
+                              </RadioButton>
+                              <RadioButton fx:id="radioYouFemale" layoutX="450.0" layoutY="140.0" mnemonicParsing="false" text="Female" toggleGroup="$TyourGender" />
+                              
+                              <Label layoutX="72.0" layoutY="170.0" text="Which gender of your mate do you prefer? " />
+                              <RadioButton fx:id="radioMateMale" layoutX="375.0" layoutY="170.0" mnemonicParsing="false"  text="Male">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="TmateGender" />
+                                       </toggleGroup>
+                              </RadioButton>
+                              <RadioButton fx:id="radioMateFemale" layoutX="450.0" layoutY="170.0" mnemonicParsing="false" text="Female" toggleGroup="$TmateGender" />
+                              
+                              <Label layoutX="72.0" layoutY="200.0" text="Do you prefer younger or older mate? " />
+                              <RadioButton fx:id="radioYoung" layoutX="375.0" layoutY="200.0" mnemonicParsing="false" text="Younger">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="Tpreference" />
+                                       </toggleGroup>
+                              </RadioButton>
+                              <RadioButton fx:id="radioOld" layoutX="450.0" layoutY="200.0" mnemonicParsing="false" text="Older" toggleGroup="$Tpreference" />
+                              
+                              <Button fx:id="buttonRecommendation" layoutX="72.0" layoutY="226.0" mnemonicParsing="false" onAction="#getRecommendedMateName" text="Get Recommendation" />
+                             
+                              
                            </children>
                         </AnchorPane>
                     </content>
