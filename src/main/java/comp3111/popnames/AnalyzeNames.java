@@ -118,6 +118,69 @@ public class AnalyzeNames {
 		 return maxRank;
 	 }
 
+	 
+	 
+	 
+	 public static int getNameCount(int year, String name, String gender) //auxiliary function for task 2
+	 {
+
+	 	int count = 0;
+	     for (CSVRecord rec : getFileParser(year)) 
+	     {
+	         // Increment rank if gender matches param
+	         if (rec.get(1).equals(gender)) 
+	         {
+	             // Return rank if name matches param
+	             if (rec.get(0).equals(name))
+	             {
+	             	count=Integer.parseInt(rec.get(2));
+	             	break;
+	             }
+	            
+	         }
+	     }
+	    return count;
+	 }
+
+	 public static double getNamePercentage(int year, String name, String gender) //auxiliary function for task 2
+	 {
+		 double percentage;
+		 int sum = 0;
+		 int count = getNameCount(year,name,gender);
+		 
+	     for (CSVRecord rec : getFileParser(year)) 
+	     {
+	         // Increment rank if gender matches param
+	         if (rec.get(1).equals(gender)) 
+	         {
+	            sum=sum+Integer.parseInt(rec.get(2));	            
+	         }
+	     }
+	     if(sum>0) percentage=100.0*count/sum;
+	     else percentage=0;
+	    return percentage;
+	 }
+	 
+	 public static int getMostPopularYear(int yearFrom, int yearTo, String name, String gender) //auxiliary function for task 2
+	 {
+		 
+		 int mostPopularYear=yearFrom;
+		 double currentBestPercentage=getNamePercentage(yearFrom,name,gender);
+		 for(int year=yearFrom;year<yearTo; year++)
+		 {
+			 if(getNamePercentage(year+1,name,gender)>currentBestPercentage)
+			 {
+				 mostPopularYear=year+1;
+				 currentBestPercentage=getNamePercentage(year+1,name,gender);
+			 }
+		 }
+		 if(currentBestPercentage<=0)
+			 return 0;
+		 else
+			 return mostPopularYear;
+	 }
+	 
+
 	 public static Pair<String, String> recommendBabyName(String dadName, int dadYOB, String momName, int momYOB, int vintageYear) {
 		 int dadRank = getRank(dadYOB, dadName, "M");
 		 int momRank = getRank(momYOB, momName, "F");
@@ -131,6 +194,33 @@ public class AnalyzeNames {
 		 return new Pair<String, String>(boyName, girlName);
 	 }
 	 
+
+	 public static String recommendedMateName(String yourName, int YOB, String yourGender, String mateGender, String preference) //NK-T5 algorithm for task 5
+	 {
+		
+		 int mateRank;
+		 int mateYOB;
+		 int yourRank=getRank(YOB,yourName,yourGender);	
+		 String younger=new String("Younger");
+		 mateRank=(yourRank==-1?66:yourRank);		
+		 mateYOB=(preference.equals(younger)?YOB+1:YOB-1);
+		 String mateName=getName(mateYOB, mateRank,mateGender);		 
+		 System.out.println(preference+" "+preference.equals(younger));
+		 return mateName;
+	 }
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+
 	 public static float compatibleScore (String iName, String iGender,int iYOB, String iNameMate, String iGenderMate, int oYOB) {
 		 int oRank = getRank(iYOB, iName, iGender);
 		 int oRankMate = getRank(oYOB, iNameMate, iGenderMate);
