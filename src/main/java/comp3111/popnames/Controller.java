@@ -80,6 +80,21 @@ public class Controller {
 
     @FXML
     private Tab tabReport2;
+    
+    @FXML
+    private TextField textFieldName;
+    
+    @FXML
+    private RadioButton radioMale2;
+
+    @FXML
+    private RadioButton radioFemale2;
+
+    @FXML
+    private TextField textFieldTo2;
+
+    @FXML
+    private TextField textFieldFrom2;
 
     @FXML
     private ToggleGroup T11;
@@ -128,6 +143,8 @@ public class Controller {
 
     @FXML
     private TextArea textAreaConsole;
+
+
     
     
     boolean verifyInputNotEmpty(TextInputControl ... cs) {
@@ -333,6 +350,115 @@ public class Controller {
     	// Show summary and error messages in the console
     	textAreaConsole.setText(oReport);
     }
+    
+    
+    
+    
+    /**
+     * Task Two
+     * To be triggered by the "Report" button on the Task Two (Reporting 2) Tab
+     * 
+     */
+    @FXML
+    void reportNamePopularity() 
+    {
+    	String oReport = "";
+    	
+    	if (verifyInputNotEmpty(textFieldName, textFieldFrom2, textFieldTo2)) 
+    	{
+	    	try 
+	    	{
+	    		// Initialize values
+	    		String name = textFieldName.getText();
+		    	//String name = String.parseString(textFieldName.getText());
+		    	RadioButton selected = (RadioButton) T11.getSelectedToggle();
+		    	String gender = selected.getText();
+		    	int yearFrom = Integer.parseInt(textFieldFrom2.getText());
+		    	int yearTo = Integer.parseInt(textFieldTo2.getText());
+		    	
+		    	if (verifyYearInRange(yearFrom, yearTo)) 
+		    	{
+		    		if(yearFrom>yearTo)
+		    			oReport +="Invalid year range. Lower bound year should not be larger than upper bound year.";
+		    		else
+		    		{
+		    		// Initialize the table
+		    		TableView<List<String>> table = new TableView<>();
+			   		for (int i=0; i<4; i++) 
+			   		{
+			   			final int index = i;
+			   			TableColumn<List<String>, String> tableColumn = new TableColumn<List<String>, String>(index == 0 ? "Year" :(index == 1? "Rank" :(index==2? "Count":"Percentage")));
+			   			tableColumn.setCellValueFactory(new Callback<CellDataFeatures<List<String>, String>, ObservableValue<String>>() 
+			   			{
+			   			    @Override
+			   			    public ObservableValue<String> call(CellDataFeatures<List<String>, String> data) 
+			   			    {
+			   			        return new ReadOnlyStringWrapper(data.getValue().get(index)) ;
+			   			    }
+			   			});
+			   			table.getColumns().add(tableColumn);
+			   		}
+			   		
+			   		// Deal with data
+			   		
+			   		final ObservableList<List<String>> tableItems = FXCollections.observableArrayList();
+			   		
+			   		
+					for (int year=yearFrom; year<=yearTo; year++) 
+					{
+						
+						
+						// add items to the table
+						List<String> popularity = new ArrayList<>();
+						popularity.add(Integer.toString(year));
+						
+						int rank=AnalyzeNames.getRank(year, name, Character.toString(gender.charAt(0)));
+						popularity.add(Integer.toString(rank));
+					
+						int count=AnalyzeNames.getNameCount(year, name, Character.toString(gender.charAt(0)));
+						popularity.add(Integer.toString(count));
+							
+						double percentage=AnalyzeNames.getNamePercentage(year, name, Character.toString(gender.charAt(0)));;
+						popularity.add(Double.toString(percentage));
+		
+						tableItems.add(popularity);
+					}
+					table.setItems(tableItems);
+					
+					// display the table
+					displayTable(table, oReport);
+			    								    	
+			    	int mostPopularYear=AnalyzeNames.getMostPopularYear(yearFrom,yearTo,name,Character.toString(gender.charAt(0)));
+			    	System.out.println(mostPopularYear);
+			    	
+			    	oReport += String.format("In the year %d, the number of birth with name %s is %d, which represents %.2f percent of total %s births in %d.\nThe year when the name %s was most popular is %d.\nIn that year, the number of births is %d, which represents %.2f percent of the total %s birth in %d.\n", 
+			    			 yearTo,name,AnalyzeNames.getNameCount(yearTo, name, Character.toString(gender.charAt(0))),AnalyzeNames.getNamePercentage(yearTo, name, Character.toString(gender.charAt(0))),gender,yearTo,name,mostPopularYear,AnalyzeNames.getNameCount(mostPopularYear, name, Character.toString(gender.charAt(0))),AnalyzeNames.getNamePercentage(mostPopularYear, name, Character.toString(gender.charAt(0))),gender,mostPopularYear);
+			    	
+		    	}
+		    	}
+		    	
+		    	else 
+		    	{
+		    		oReport += "Error: Year Out of Range. Please check your input years.\n";
+		    	}
+		    
+		    } catch (Exception e) 
+	    	{
+				oReport += "Error: Invalid Input. Please check your input values.\n";
+			}
+		} 
+    	
+    	else 
+		{
+			oReport += "Error: Empty Input. Please fill in all the text fields.\n";
+		}
+    	
+    	// Show summary and error messages in the console
+    	textAreaConsole.setText(oReport);
+    }
+    
+    
+    
     
     /**
      * Task Four
