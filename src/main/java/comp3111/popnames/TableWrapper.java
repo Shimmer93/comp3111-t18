@@ -10,11 +10,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.util.Callback;
-
+/** 
+ * This class aids with the display of the result.
+ * */
 public class TableWrapper {
 	private TableView<List<String>> table;
 	private final ObservableList<List<String>> tableItems; 
-	
+	/** 
+	 * This is the constructor that initialize the columns of the table
+	 * @param  columnNames The list of column names to be added to the table.
+	 * */
 	public TableWrapper(List<String> columnNames) {
 		table = new TableView<List<String>>();
 		tableItems = FXCollections.observableArrayList();
@@ -32,11 +37,16 @@ public class TableWrapper {
    			table.getColumns().add(tableColumn);
    		}
 	}
-	
+	/** 
+	 * This function helps to add a row to the table
+	 * @param row The row to be added to the table
+	 * */
 	public void addRow(List<String> row) {
 		tableItems.add(row);
 	}
-	
+	/** 
+	 * This function returns the table view 
+	 * */
 	public TableView<List<String>> getTable() {
 		return table;
 	}
