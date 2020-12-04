@@ -181,20 +181,10 @@ public class AnalyzeNames {
 		 mateRank=(yourRank==-1?66:yourRank);		
 		 mateYOB=(preference.equals(younger)?YOB+1:YOB-1);
 		 String mateName=getName(mateYOB, mateRank,mateGender);		 
-		 System.out.println(preference+" "+preference.equals(younger));
 		 return mateName;
 	 }
 	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
+	 	 
 	 
 
 	 public static float compatibleScore (String iName, String iGender,int iYOB, String iNameMate, String iGenderMate, int oYOB) {
